@@ -5,7 +5,7 @@
 @endslot
 
 @section('header-actions')
-<a href="/jobs/create" class="bg-secondary text-on-secondary px-md py-xs rounded flex items-center gap-xs font-body-md font-bold hover:brightness-95 active:scale-95 transition-all h-10 px-4 items-center justify-center">
+<a href="/jobs/create" class="bg-secondary text-on-secondary px-6 py-2 rounded-lg flex items-center gap-2 font-semibold text-body-sm transition-all shadow-lg shadow-primary/20 hover:brightness-105 active:scale-95">
     Create New Job
 </a>
 @endsection

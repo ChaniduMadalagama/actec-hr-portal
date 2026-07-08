@@ -5,9 +5,9 @@
 @endslot
 
 @section('header-actions')
-<button onclick="window.location.href='/jobs/create'" class="bg-primary text-on-primary px-4 py-2 rounded-lg font-label-caps text-[12px] hover:opacity-90 active:scale-95 transition-all">
+<a href="/jobs/create" class="bg-secondary text-on-secondary px-6 py-2 rounded-lg flex items-center gap-2 font-semibold text-body-sm transition-all shadow-lg shadow-primary/20 hover:brightness-105 active:scale-95">
     Create New Job
-</button>
+</a>
 @endsection
 
 @section('content')
