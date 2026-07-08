@@ -5,8 +5,27 @@
 @endslot
 
 @section('styles')
+<!-- Leaflet Map CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 <style>
     #globalSearchInput { display: none !important; }
+    /* Fix Leaflet dark mode overrides and controls styling to match modern UI */
+    .leaflet-bar {
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        background-color: rgba(26, 27, 58, 0.8) !important;
+    }
+    .leaflet-bar a {
+        background-color: transparent !important;
+        color: #e0e3e5 !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+    }
+    .leaflet-bar a:hover {
+        background-color: rgba(255, 255, 255, 0.1) !important;
+        color: #00dbe7 !important;
+    }
+    .leaflet-container {
+        font-family: inherit;
+    }
 </style>
 @endsection
 
@@ -14,12 +33,13 @@
 <form id="jobDispatchForm" onsubmit="handleJobDispatch(event)">
     <div class="max-w-6xl mx-auto">
         <!-- Header Section -->
-        <div class="flex flex-col md:flex-row md:items-end justify-between gap-md mb-8">
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
             <div>
                 <h1 class="text-headline-lg font-headline-lg text-white font-bold text-3xl">New Service Dispatch</h1>
                 <p class="text-body-md text-on-surface-variant mt-xs">Schedule and assign a new AC maintenance task for immediate deployment.</p>
             </div>
-            <div class="flex gap-md mt-4">
+            <!-- Standard spacing: gap-4 ensures they are spaced correctly -->
+            <div class="flex gap-4 mt-4">
                 <a href="/dashboard" class="px-4 py-2.5 border border-white/10 text-white font-semibold rounded-lg hover:bg-white/5 transition-colors flex items-center">Cancel</a>
                 <button type="submit" class="px-6 py-2.5 bg-secondary text-on-secondary font-semibold rounded-lg shadow-lg shadow-secondary/20 hover:brightness-105 active:scale-95 transition-all flex items-center gap-2">
                     <span class="material-symbols-outlined text-[20px]">save</span>
@@ -51,7 +71,7 @@
                             <div>
                                 <label class="block text-label-caps font-label-caps text-on-surface-variant mb-1">SERVICE ADDRESS</label>
                                 <div class="relative">
-                                    <input class="w-full bg-[#1A1B3A] border border-white/10 rounded-lg pl-4 pr-10 py-2.5 text-white focus:ring-2 focus:ring-secondary focus:border-transparent outline-none text-sm" id="serviceAddress" placeholder="Street, City, Zip Code" required type="text" />
+                                    <input class="w-full bg-[#1A1B3A] border border-white/10 rounded-lg pl-4 pr-10 py-2.5 text-white focus:ring-2 focus:ring-secondary focus:border-transparent outline-none text-sm" id="serviceAddress" placeholder="Enter address to search or click on map..." required type="text" />
                                     <span class="material-symbols-outlined absolute right-3 top-2.5 text-outline">location_on</span>
                                 </div>
                             </div>
@@ -66,13 +86,12 @@
                                 </div>
                             </div>
                         </div>
-                        <!-- Geolocation Picker Placeholder -->
-                        <div class="relative h-full min-h-[220px] rounded-xl border border-white/10 overflow-hidden">
-                            <iframe class="w-full h-full border-none opacity-80" 
-                                src="https://maps.google.com/maps?q=Chicago&t=&z=11&ie=UTF8&iwloc=&output=embed"></iframe>
-                            <div class="absolute top-3 left-3 bg-[#101415]/90 backdrop-blur-sm p-2 rounded-lg border border-white/10 shadow-lg">
-                                <span class="text-label-caps font-label-caps text-primary block text-[10px]">DISPATCH REGION</span>
-                                <span class="text-label-caps font-label-caps text-secondary text-xs">Chicago Area Command</span>
+                        <!-- Geolocation Map Picker -->
+                        <div class="relative h-full min-h-[260px] rounded-xl border border-white/10 overflow-hidden">
+                            <div id="map" class="w-full h-full min-h-[260px] opacity-90"></div>
+                            <div class="absolute top-3 left-12 bg-[#101415]/90 backdrop-blur-sm p-2 rounded-lg border border-white/10 shadow-lg z-[1000] pointer-events-none">
+                                <span class="text-label-caps font-label-caps text-primary block text-[10px]">MAP PICKER</span>
+                                <span class="text-label-caps font-label-caps text-secondary text-[11px]">Click or drag pin to select location</span>
                             </div>
                         </div>
                     </div>
@@ -128,7 +147,87 @@
 @endsection
 
 @section('scripts')
+<!-- Leaflet Map JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script>
+    // Initialize Map default (Chicago area commands)
+    let map = L.map('map').setView([41.8781, -87.6298], 11);
+    
+    // Add dark theme tile layer matching design
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        maxZoom: 20
+    }).addTo(map);
+
+    // Initial marker placement
+    let marker = L.marker([41.8781, -87.6298], { draggable: true }).addTo(map);
+
+    function updateCoords(lat, lng) {
+        document.getElementById('latitude').value = lat.toFixed(6);
+        document.getElementById('longitude').value = lng.toFixed(6);
+    }
+
+    marker.on('dragend', function (e) {
+        let position = marker.getLatLng();
+        updateCoords(position.lat, position.lng);
+        reverseGeocode(position.lat, position.lng);
+    });
+
+    map.on('click', function (e) {
+        marker.setLatLng(e.latlng);
+        updateCoords(e.latlng.lat, e.latlng.lng);
+        reverseGeocode(e.latlng.lat, e.latlng.lng);
+    });
+
+    // Reverse geocoding via OpenStreetMap API
+    async function reverseGeocode(lat, lng) {
+        try {
+            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+            const data = await res.json();
+            if (data && data.display_name) {
+                document.getElementById('serviceAddress').value = data.display_name;
+            }
+        } catch (err) {
+            console.error('Error reverse geocoding:', err);
+        }
+    }
+
+    // Geocoding search address field
+    let searchTimeout;
+    document.getElementById('serviceAddress').addEventListener('input', function(e) {
+        clearTimeout(searchTimeout);
+        const query = e.target.value;
+        if (query.length < 4) return;
+        
+        searchTimeout = setTimeout(async () => {
+            try {
+                const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`);
+                const data = await res.json();
+                if (data && data.length > 0) {
+                    const first = data[0];
+                    const lat = parseFloat(first.lat);
+                    const lng = parseFloat(first.lon);
+                    marker.setLatLng([lat, lng]);
+                    map.panTo([lat, lng]);
+                    updateCoords(lat, lng);
+                }
+            } catch (err) {
+                console.error('Geocoding error:', err);
+            }
+        }, 1200);
+    });
+
+    document.getElementById('latitude').addEventListener('change', updateMarkerFromInputs);
+    document.getElementById('longitude').addEventListener('change', updateMarkerFromInputs);
+
+    function updateMarkerFromInputs() {
+        const lat = parseFloat(document.getElementById('latitude').value);
+        const lng = parseFloat(document.getElementById('longitude').value);
+        if (!isNaN(lat) && !isNaN(lng)) {
+            marker.setLatLng([lat, lng]);
+            map.panTo([lat, lng]);
+        }
+    }
+
     async function loadTechnicians() {
         const token = localStorage.getItem('api_token');
         try {
