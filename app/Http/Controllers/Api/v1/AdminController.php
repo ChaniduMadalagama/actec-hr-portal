@@ -126,4 +126,26 @@ class AdminController extends Controller
         $logs = $this->timeLogRepository->all();
         return TimeLogResource::collection($logs);
     }
+
+    /**
+     * Reset technician password.
+     */
+    public function resetTechnicianPassword($id)
+    {
+        $user = $this->userRepository->find($id);
+        if (!$user || $user->role !== 'technician') {
+            return response()->json(['message' => 'Technician not found.'], 404);
+        }
+
+        $plainPassword = Str::random(12);
+        $user->password = Hash::make($plainPassword);
+        $user->save();
+
+        return response()->json([
+            'message' => 'Password reset successfully.',
+            'username' => $user->username,
+            'password' => $plainPassword,
+        ], 200);
+    }
 }
+

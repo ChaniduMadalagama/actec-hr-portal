@@ -13,45 +13,45 @@
 
 @section('content')
 <div class="flex items-center justify-between">
-    <h1 class="text-headline-lg font-headline-lg text-on-surface text-white">Technician Management</h1>
+    <div>
+        <h2 class="font-headline-lg text-headline-lg text-white mb-1">Technician Management</h2>
+        <p class="text-outline font-body-md">Register new fleet members, review status, or reset credentials.</p>
+    </div>
 </div>
 
-<!-- Metric Cards -->
+<!-- Stats Grid -->
 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-    <!-- Total Technicians -->
     <div class="glass-card rounded-xl p-6 relative overflow-hidden group">
         <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-            <span class="material-symbols-outlined text-6xl">engineering</span>
+            <span class="material-symbols-outlined text-6xl">groups</span>
         </div>
-        <p class="text-label-caps font-label-caps text-on-surface-variant mb-4 uppercase tracking-widest">Total Technicians</p>
+        <p class="text-label-caps font-label-caps text-on-surface-variant mb-4 uppercase tracking-widest text-[11px]">Total Technicians</p>
         <div class="flex items-end gap-2">
-            <h3 id="totalTechsCount" class="text-headline-xl font-headline-xl text-primary">0</h3>
+            <h3 id="totalTechsCount" class="text-headline-xl font-headline-xl text-on-surface text-white">0</h3>
             <span class="text-body-sm text-on-surface-variant mb-2 font-medium">Headcount</span>
         </div>
         <div class="mt-4 h-1 w-full bg-white/5 rounded-full overflow-hidden">
-            <div class="h-full bg-primary w-full shadow-[0_0_8px_rgba(184,195,255,0.5)]"></div>
+            <div class="h-full bg-secondary w-full"></div>
         </div>
     </div>
-    <!-- On-Duty (Active) -->
     <div class="glass-card rounded-xl p-6 relative overflow-hidden group">
         <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-            <span class="material-symbols-outlined text-6xl">bolt</span>
+            <span class="material-symbols-outlined text-6xl text-emerald-400">bolt</span>
         </div>
-        <p class="text-label-caps font-label-caps text-on-surface-variant mb-4 uppercase tracking-widest">On-Duty (Active)</p>
+        <p class="text-label-caps font-label-caps text-on-surface-variant mb-4 uppercase tracking-widest text-[11px]">On-Duty (Active)</p>
         <div class="flex items-end gap-2">
-            <h3 id="activeTechsCount" class="text-headline-xl font-headline-xl text-secondary">0</h3>
+            <h3 id="activeTechsCount" class="text-headline-xl font-headline-xl text-on-surface text-white">0</h3>
             <span class="text-body-sm text-on-surface-variant mb-2 font-medium">Currently online</span>
         </div>
         <div class="mt-4 h-1 w-full bg-white/5 rounded-full overflow-hidden">
-            <div class="h-full bg-secondary w-1/2 transition-all duration-1000 shadow-[0_0_8px_rgba(0,219,231,0.5)]"></div>
+            <div class="h-full bg-emerald-400 w-0"></div>
         </div>
     </div>
-    <!-- Off-Duty (Offline) -->
     <div class="glass-card rounded-xl p-6 relative overflow-hidden group">
         <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
             <span class="material-symbols-outlined text-6xl">cloud_off</span>
         </div>
-        <p class="text-label-caps font-label-caps text-on-surface-variant mb-4 uppercase tracking-widest">Off-Duty (Offline)</p>
+        <p class="text-label-caps font-label-caps text-on-surface-variant mb-4 uppercase tracking-widest text-[11px]">Off-Duty (Offline)</p>
         <div class="flex items-end gap-2">
             <h3 id="offlineTechsCount" class="text-headline-xl font-headline-xl text-on-surface text-white">0</h3>
             <span class="text-body-sm text-on-surface-variant mb-2 font-medium">Offline</span>
@@ -80,11 +80,12 @@
                     <th class="px-6 py-4 text-label-caps font-label-caps text-on-surface-variant uppercase tracking-wider">Email</th>
                     <th class="px-6 py-4 text-label-caps font-label-caps text-on-surface-variant uppercase tracking-wider">Username</th>
                     <th class="px-6 py-4 text-label-caps font-label-caps text-on-surface-variant uppercase tracking-wider">Live Status</th>
+                    <th class="px-6 py-4 text-label-caps font-label-caps text-on-surface-variant uppercase tracking-wider text-right">Actions</th>
                 </tr>
             </thead>
             <tbody id="techsTableBody" class="divide-y divide-white/5">
                 <tr>
-                    <td colspan="4" class="px-6 py-8 text-center text-outline">Loading technicians...</td>
+                    <td colspan="5" class="px-6 py-8 text-center text-outline">Loading technicians...</td>
                 </tr>
             </tbody>
         </table>
@@ -130,17 +131,17 @@
             <div class="w-16 h-16 bg-emerald-500/10 text-emerald-400 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-emerald-500/30 shadow-lg">
                 <span class="material-symbols-outlined text-[32px]">check_circle</span>
             </div>
-            <h2 class="font-headline-md text-headline-md font-bold text-white">Registration Successful</h2>
-            <p class="text-body-md text-on-surface-variant mt-2">Profile created for <span class="font-bold text-white" id="displayTechName">Michael Finn</span></p>
+            <h2 class="font-headline-md text-headline-md font-bold text-white" id="successTitle">Registration Successful</h2>
+            <p class="text-body-md text-on-surface-variant mt-2">Account details for <span class="font-bold text-white" id="displayTechName">Michael Finn</span></p>
         </div>
         <div class="p-8 space-y-6">
             <div class="grid grid-cols-2 gap-4">
                 <div class="p-4 bg-white/5 rounded-xl border border-white/5">
-                    <p class="text-label-caps font-label-caps text-on-surface-variant mb-1">UNIQUE USERNAME</p>
+                    <p class="text-label-caps font-label-caps text-on-surface-variant mb-1">USERNAME</p>
                     <p class="font-label-caps text-secondary text-base" id="genUsername">@m_finn</p>
                 </div>
                 <div class="p-4 bg-white/5 rounded-xl border border-white/5">
-                    <p class="text-label-caps font-label-caps text-on-surface-variant mb-1">TEMPORARY PASSWORD</p>
+                    <p class="text-label-caps font-label-caps text-on-surface-variant mb-1">PASSWORD</p>
                     <p class="font-label-caps text-white text-base tracking-wider" id="genPassword">LF-772-XT9</p>
                 </div>
             </div>
@@ -196,7 +197,7 @@
         // Table Body
         const tbody = document.getElementById('techsTableBody');
         if (techs.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-8 text-center text-outline">No technicians registered.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-outline">No technicians registered.</td></tr>`;
             return;
         }
 
@@ -205,7 +206,6 @@
                 ? `<span class="inline-flex items-center px-3 py-1 bg-emerald-500/10 text-emerald-400 rounded-full text-[11px] font-bold uppercase tracking-wider border border-emerald-500/20"><span class="status-dot bg-emerald-400 animate-pulse"></span>On Duty</span>`
                 : `<span class="inline-flex items-center px-3 py-1 bg-white/5 text-on-surface-variant rounded-full text-[11px] font-bold uppercase tracking-wider border border-white/10"><span class="status-dot bg-gray-400"></span>Off Duty</span>`;
 
-            // Initials helper
             const initials = tech.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
 
             return `
@@ -221,9 +221,50 @@
                     <td class="px-6 py-5 text-body-sm text-on-surface-variant">${escapeHtml(tech.email)}</td>
                     <td class="px-6 py-5 text-body-sm font-mono text-secondary">@${escapeHtml(tech.username)}</td>
                     <td class="px-6 py-5">${statusBadge}</td>
+                    <td class="px-6 py-5 text-right">
+                        <button onclick="handlePasswordReset(${tech.id}, '${escapeHtml(tech.name)}')" class="px-3 py-1.5 border border-white/10 hover:border-secondary hover:text-secondary rounded-lg font-semibold text-xs transition-colors text-white">
+                            Reset Password
+                        </button>
+                    </td>
                 </tr>
             `;
         }).join('');
+    }
+
+    async function handlePasswordReset(techId, techName) {
+        if (!confirm(`Are you sure you want to reset the password for ${techName}?`)) return;
+
+        const token = localStorage.getItem('api_token');
+        try {
+            const response = await fetch(`/api/v1/admin/users/${techId}/reset-password`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'application/json'
+                }
+            });
+            const data = await response.json();
+            if (response.ok) {
+                // Populate Success modal for Password Reset
+                document.getElementById('successTitle').innerText = 'Password Reset Successful';
+                document.getElementById('displayTechName').innerText = techName;
+                document.getElementById('genUsername').innerText = `@${data.username}`;
+                document.getElementById('genPassword').innerText = data.password;
+
+                const template = `Hello ${techName},\nYour LogiFlow Dispatch portal credentials have been reset.\n\nUsername: @${data.username}\nNew Password: ${data.password}\n\nLogin: http://127.0.0.1:8000/login`;
+                document.getElementById('invitationTemplateText').innerText = template;
+
+                // Show Success View Modal
+                document.getElementById('registrationModal').classList.remove('hidden');
+                document.getElementById('formView').classList.add('hidden');
+                document.getElementById('successView').classList.remove('hidden');
+            } else {
+                alert(data.message || 'Failed to reset password.');
+            }
+        } catch (err) {
+            console.error(err);
+            alert('Server error resetting password.');
+        }
     }
 
     async function handleRegistration(event) {
@@ -249,23 +290,25 @@
             });
 
             const data = await response.json();
-
             if (response.ok) {
-                document.getElementById('displayTechName').innerText = data.user.name;
+                // Populate Success modal
+                document.getElementById('successTitle').innerText = 'Registration Successful';
+                document.getElementById('displayTechName').innerText = name;
                 document.getElementById('genUsername').innerText = `@${data.username}`;
                 document.getElementById('genPassword').innerText = data.password;
 
-                document.getElementById('invitationTemplateText').innerText = 
-                    `Welcome to LogiFlow, ${data.user.name}! Your technician account has been created. Username: @${data.username} | Password: ${data.password}. Please sign in to start duty.`;
+                const template = `Hello ${name},\nWelcome to the fleet. Your LogiFlow Dispatch portal credentials have been initialized.\n\nUsername: @${data.username}\nTemporary Password: ${data.password}\n\nLogin: http://127.0.0.1:8000/login`;
+                document.getElementById('invitationTemplateText').innerText = template;
 
+                // Toggle views in modal
                 document.getElementById('formView').classList.add('hidden');
                 document.getElementById('successView').classList.remove('hidden');
             } else {
                 alert(data.message || 'Registration failed.');
             }
         } catch (err) {
-            console.error(err);
-            alert('Server error registering technician.');
+            console.error('Registration error:', err);
+            alert('Server error registering user.');
         } finally {
             submitBtn.innerHTML = 'Create Profile';
             submitBtn.disabled = false;
@@ -285,11 +328,6 @@
             const text = row.innerText.toLowerCase();
             row.style.display = text.includes(val) ? '' : 'none';
         });
-    });
-
-    // Close on escape
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') closeModal();
     });
 
     // Initial load

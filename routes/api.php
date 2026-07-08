@@ -23,6 +23,7 @@ Route::prefix('v1')->group(function () {
     Route::prefix('admin')->middleware(['auth:sanctum', 'role.admin'])->group(function () {
         Route::post('users/register', [AdminController::class, 'registerTechnician']);
         Route::get('users/technicians', [AdminController::class, 'listTechnicians']);
+        Route::post('users/{id}/reset-password', [AdminController::class, 'resetTechnicianPassword']);
         
         Route::post('jobs', [AdminController::class, 'createJob']);
         Route::get('jobs', [AdminController::class, 'listJobs']);
