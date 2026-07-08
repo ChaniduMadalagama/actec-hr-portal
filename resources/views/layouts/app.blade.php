@@ -167,7 +167,7 @@
             <span class="material-symbols-outlined">calendar_today</span>
             <span class="font-label-caps">Dispatch</span>
         </a>
-        <a class="flex items-center gap-3 px-3 py-3 text-on-surface-variant hover:text-on-surface hover:bg-white/10 rounded-lg transition-all duration-200" href="/dashboard">
+        <a class="flex items-center gap-3 px-3 py-3 text-on-surface-variant hover:text-on-surface hover:bg-white/10 rounded-lg transition-all duration-200 {{ Request::is('analytics') ? 'sidebar-active font-bold' : '' }}" href="/analytics">
             <span class="material-symbols-outlined">insights</span>
             <span class="font-label-caps">Analytics</span>
         </a>

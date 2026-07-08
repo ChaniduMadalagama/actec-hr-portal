@@ -40,3 +40,8 @@ Route::get('/settings', function () {
     return view('settings');
 });
 
+Route::get('/analytics', function () {
+    return view('analytics');
+});
+
+
