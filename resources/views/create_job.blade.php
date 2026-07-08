@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 <style>
     #globalSearchInput { display: none !important; }
-    /* Fix Leaflet dark mode overrides and controls styling to match modern UI */
+    /* Leaflet overrides to fit dark theme */
     .leaflet-bar {
         border: 1px solid rgba(255, 255, 255, 0.1) !important;
         background-color: rgba(26, 27, 58, 0.8) !important;
@@ -30,6 +30,43 @@
 @endsection
 
 @section('content')
+<!-- Map Selection Modal at root level to prevent clipping -->
+<div id="mapModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-[9999] p-4">
+    <div class="glass-modal w-full max-w-4xl rounded-2xl overflow-hidden flex flex-col shadow-2xl border border-white/10 h-[80vh]">
+        <!-- Modal Header -->
+        <div class="px-6 py-4 border-b border-white/10 flex items-center justify-between bg-white/5">
+            <div>
+                <h3 class="text-headline-sm font-headline-sm text-white font-bold text-lg">Pick Service Location</h3>
+                <p class="text-xs text-outline">Search or drag the pin to mark the exact service coordinates.</p>
+            </div>
+            <button type="button" onclick="closeMapModal()" class="text-outline hover:text-white transition-colors flex items-center justify-center p-2 rounded-full hover:bg-white/5">
+                <span class="material-symbols-outlined text-xl">close</span>
+            </button>
+        </div>
+        <!-- Modal Body (Map Container) -->
+        <div class="flex-grow relative bg-[#1A1B3A]">
+            <div id="modalMap" class="w-full h-full"></div>
+            <!-- Floating Address Search Input -->
+            <div class="absolute top-4 left-12 right-12 z-[1000] flex gap-2 max-w-md">
+                <input id="modalSearchAddress" type="text" placeholder="Search address in Sri Lanka..." class="w-full bg-[#101415]/95 border border-white/15 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-secondary focus:border-transparent outline-none shadow-xl" onkeydown="if(event.key === 'Enter') { event.preventDefault(); searchModalAddress(); }" />
+                <button type="button" onclick="searchModalAddress()" class="bg-secondary text-on-secondary px-4 rounded-lg font-semibold text-sm hover:brightness-105 active:scale-95 transition-all flex items-center justify-center shadow-lg shrink-0">
+                    <span class="material-symbols-outlined text-sm">search</span>
+                </button>
+            </div>
+        </div>
+        <!-- Modal Footer -->
+        <div class="px-6 py-4 border-t border-white/10 bg-[#14152D]/95 flex items-center justify-between">
+            <div class="text-left max-w-md">
+                <p id="modalCoordsText" class="text-xs font-mono text-secondary font-bold">Coords: 6.927100, 79.861200</p>
+                <p id="modalAddressText" class="text-[11px] text-outline truncate mt-0.5">Colombo, Sri Lanka</p>
+            </div>
+            <button type="button" onclick="confirmMapSelection()" class="bg-secondary text-on-secondary px-6 py-2.5 rounded-lg font-bold text-sm shadow-lg shadow-secondary/20 hover:brightness-105 active:scale-95 transition-all flex items-center gap-2">
+                <span class="material-symbols-outlined text-[18px]">check_circle</span> Confirm Location
+            </button>
+        </div>
+    </div>
+</div>
+
 <form id="jobDispatchForm" onsubmit="handleJobDispatch(event)">
     <div class="max-w-6xl mx-auto">
         <!-- Header Section -->
@@ -57,7 +94,7 @@
                         <span class="material-symbols-outlined text-secondary">person_pin_circle</span>
                         <h2 class="text-headline-sm font-headline-sm font-semibold text-white">Client Information</h2>
                     </div>
-                    <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6 relative">
+                    <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="flex flex-col gap-4">
                             <div>
                                 <label class="block text-label-caps font-label-caps text-on-surface-variant mb-1">CLIENT NAME</label>
@@ -70,32 +107,32 @@
                             <div>
                                 <label class="block text-label-caps font-label-caps text-on-surface-variant mb-1">SERVICE ADDRESS</label>
                                 <div class="relative">
-                                    <input class="w-full bg-[#1A1B3A] border border-white/10 rounded-lg pl-4 pr-10 py-2.5 text-white focus:ring-2 focus:ring-secondary focus:border-transparent outline-none text-sm" id="serviceAddress" placeholder="Enter address to search or click on map..." required type="text" />
-                                    <span class="material-symbols-outlined absolute right-3 top-2.5 text-outline">location_on</span>
+                                    <input class="w-full bg-[#1A1B3A] border border-white/10 rounded-lg pl-4 pr-10 py-2.5 text-white focus:ring-2 focus:ring-secondary focus:border-transparent outline-none text-sm" id="serviceAddress" placeholder="Colombo, Sri Lanka" required type="text" />
+                                    <button type="button" onclick="openMapModal()" class="absolute right-2 top-2 text-secondary hover:text-white transition-colors flex items-center justify-center p-1 hover:bg-white/5 rounded">
+                                        <span class="material-symbols-outlined">my_location</span>
+                                    </button>
                                 </div>
                             </div>
                             <div class="grid grid-cols-2 gap-2">
                                 <div>
                                     <label class="block text-label-caps text-on-surface-variant mb-1 text-[10px]">LATITUDE</label>
-                                    <input class="w-full bg-[#1A1B3A] border border-white/10 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-secondary focus:border-transparent outline-none text-xs" id="latitude" placeholder="e.g. 6.9271" required type="number" step="any" />
+                                    <input class="w-full bg-[#1A1B3A] border border-white/10 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-secondary focus:border-transparent outline-none text-xs" id="latitude" placeholder="e.g. 6.9271" required type="number" step="any" readonly />
                                 </div>
                                 <div>
                                     <label class="block text-label-caps text-on-surface-variant mb-1 text-[10px]">LONGITUDE</label>
-                                    <input class="w-full bg-[#1A1B3A] border border-white/10 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-secondary focus:border-transparent outline-none text-xs" id="longitude" placeholder="e.g. 79.8612" required type="number" step="any" />
+                                    <input class="w-full bg-[#1A1B3A] border border-white/10 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-secondary focus:border-transparent outline-none text-xs" id="longitude" placeholder="e.g. 79.8612" required type="number" step="any" readonly />
                                 </div>
                             </div>
                         </div>
-                        <!-- Geolocation Map Picker -->
-                        <div id="map-container" class="relative h-full min-h-[260px] rounded-xl border border-white/10 overflow-hidden transition-all duration-300">
-                            <div id="map" class="w-full h-full min-h-[260px] opacity-90"></div>
-                            <div class="absolute top-3 left-12 bg-[#101415]/90 backdrop-blur-sm p-2 rounded-lg border border-white/10 shadow-lg z-[1000] pointer-events-none">
-                                <span class="text-label-caps font-label-caps text-primary block text-[10px]">MAP PICKER</span>
-                                <span class="text-label-caps font-label-caps text-secondary text-[11px]">Click or drag pin to select location</span>
+                        <!-- Geolocation Map Preview Thumbnail Card -->
+                        <div onclick="openMapModal()" class="relative h-full min-h-[260px] rounded-xl border border-white/10 overflow-hidden cursor-pointer group hover:border-secondary/40 transition-colors">
+                            <div id="previewMap" class="w-full h-full min-h-[260px] opacity-75 group-hover:opacity-90 transition-opacity"></div>
+                            <div class="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                                <span class="bg-[#101415]/95 backdrop-blur-sm px-4 py-2 rounded-lg border border-white/10 shadow-lg text-secondary text-xs font-bold font-label-caps flex items-center gap-2 transform group-hover:scale-105 transition-all z-[999] pointer-events-none">
+                                    <span class="material-symbols-outlined text-[16px]">map</span>
+                                    Pick on Map
+                                </span>
                             </div>
-                            <!-- Expand to big view button -->
-                            <button type="button" onclick="toggleFullscreenMap()" class="absolute top-3 right-3 bg-[#101415]/90 backdrop-blur-sm p-2 rounded-lg border border-white/10 shadow-lg z-[1000] hover:bg-white/10 text-white transition-colors flex items-center justify-center" title="Toggle Big Map View">
-                                <span id="expand-icon" class="material-symbols-outlined text-[18px]">fullscreen</span>
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -153,109 +190,130 @@
 <!-- Leaflet Map JS -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script>
-    // Initialize Map default - Colombo, Sri Lanka command command command
-    let map = L.map('map').setView([6.9271, 79.8612], 13);
+    // Selected coordinates (Default: Colombo, Sri Lanka)
+    let selectedLat = 6.9271;
+    let selectedLng = 79.8612;
+    let selectedAddress = 'Colombo, Sri Lanka';
+
+    // Initialize Preview (Thumbnail) Map - Interactivity disabled
+    let previewMap = L.map('previewMap', {
+        zoomControl: false,
+        dragging: false,
+        scrollWheelZoom: false,
+        doubleClickZoom: false,
+        boxZoom: false,
+        touchZoom: false
+    }).setView([selectedLat, selectedLng], 13);
     
-    // Add dark theme tile layer matching design
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
         maxZoom: 20
-    }).addTo(map);
+    }).addTo(previewMap);
 
-    // Initial marker placement centered in Colombo, Sri Lanka
-    let marker = L.marker([6.9271, 79.8612], { draggable: true }).addTo(map);
+    let previewMarker = L.marker([selectedLat, selectedLng]).addTo(previewMap);
 
-    // Set defaults in form coordinates
-    updateCoords(6.9271, 79.8612);
+    // Initialize Modal (Large) Map
+    let modalMap;
+    let modalMarker;
 
-    function updateCoords(lat, lng) {
-        document.getElementById('latitude').value = lat.toFixed(6);
-        document.getElementById('longitude').value = lng.toFixed(6);
+    function initModalMap() {
+        if (modalMap) return;
+
+        modalMap = L.map('modalMap').setView([selectedLat, selectedLng], 14);
+        
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            maxZoom: 20
+        }).addTo(modalMap);
+
+        modalMarker = L.marker([selectedLat, selectedLng], { draggable: true }).addTo(modalMap);
+
+        // Update modal metrics when dragging
+        modalMarker.on('dragend', function (e) {
+            let position = modalMarker.getLatLng();
+            updateModalStatus(position.lat, position.lng);
+        });
+
+        // Click to place marker on modal map
+        modalMap.on('click', function (e) {
+            modalMarker.setLatLng(e.latlng);
+            updateModalStatus(e.latlng.lat, e.latlng.lng);
+        });
     }
 
-    marker.on('dragend', function (e) {
-        let position = marker.getLatLng();
-        updateCoords(position.lat, position.lng);
-        reverseGeocode(position.lat, position.lng);
-    });
-
-    map.on('click', function (e) {
-        marker.setLatLng(e.latlng);
-        updateCoords(e.latlng.lat, e.latlng.lng);
-        reverseGeocode(e.latlng.lat, e.latlng.lng);
-    });
-
-    // Toggle Big Map Mode
-    function toggleFullscreenMap() {
-        const container = document.getElementById('map-container');
-        const icon = document.getElementById('expand-icon');
-        const mapEl = document.getElementById('map');
-        
-        const isFullscreen = container.classList.contains('fixed');
-        
-        if (!isFullscreen) {
-            container.classList.add('fixed', 'inset-10', 'z-[9999]', 'glass-card', 'shadow-2xl');
-            mapEl.style.height = '100%';
-            icon.innerText = 'fullscreen_exit';
-        } else {
-            container.classList.remove('fixed', 'inset-10', 'z-[9999]', 'glass-card', 'shadow-2xl');
-            mapEl.style.height = '';
-            icon.innerText = 'fullscreen';
-        }
-
-        // recalculate Map size
-        setTimeout(() => {
-            map.invalidateSize(true);
-        }, 100);
+    function updateModalStatus(lat, lng) {
+        document.getElementById('modalCoordsText').innerText = `Coords: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+        reverseGeocodeModal(lat, lng);
     }
 
-    // Reverse geocoding via OpenStreetMap API
-    async function reverseGeocode(lat, lng) {
+    async function reverseGeocodeModal(lat, lng) {
         try {
             const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
             const data = await res.json();
             if (data && data.display_name) {
-                document.getElementById('serviceAddress').value = data.display_name;
+                document.getElementById('modalAddressText').innerText = data.display_name;
             }
         } catch (err) {
-            console.error('Error reverse geocoding:', err);
+            console.error(err);
         }
     }
 
-    // Geocoding search address field
-    let searchTimeout;
-    document.getElementById('serviceAddress').addEventListener('input', function(e) {
-        clearTimeout(searchTimeout);
-        const query = e.target.value;
-        if (query.length < 4) return;
+    function openMapModal() {
+        const modal = document.getElementById('mapModal');
+        modal.classList.remove('hidden');
         
-        searchTimeout = setTimeout(async () => {
-            try {
-                // Focus on Sri Lanka geocoding specifically
-                const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query + ', Sri Lanka')}`);
-                const data = await res.json();
-                if (data && data.length > 0) {
-                    const first = data[0];
-                    const lat = parseFloat(first.lat);
-                    const lng = parseFloat(first.lon);
-                    marker.setLatLng([lat, lng]);
-                    map.panTo([lat, lng]);
-                    updateCoords(lat, lng);
-                }
-            } catch (err) {
-                console.error('Geocoding error:', err);
+        // Init map delayed to guarantee viewport rendering size is set
+        setTimeout(() => {
+            initModalMap();
+            modalMap.invalidateSize();
+            modalMap.setView([selectedLat, selectedLng], 14);
+            modalMarker.setLatLng([selectedLat, selectedLng]);
+            document.getElementById('modalCoordsText').innerText = `Coords: ${selectedLat.toFixed(6)}, ${selectedLng.toFixed(6)}`;
+            document.getElementById('modalAddressText').innerText = selectedAddress;
+        }, 100);
+    }
+
+    function closeMapModal() {
+        document.getElementById('mapModal').classList.add('hidden');
+    }
+
+    function confirmMapSelection() {
+        const position = modalMarker.getLatLng();
+        selectedLat = position.lat;
+        selectedLng = position.lng;
+        selectedAddress = document.getElementById('modalAddressText').innerText;
+
+        // Update Form Inputs
+        document.getElementById('latitude').value = selectedLat.toFixed(6);
+        document.getElementById('longitude').value = selectedLng.toFixed(6);
+        document.getElementById('serviceAddress').value = selectedAddress;
+
+        // Update Small Preview Map
+        previewMap.setView([selectedLat, selectedLng], 13);
+        previewMarker.setLatLng([selectedLat, selectedLng]);
+
+        closeMapModal();
+    }
+
+    // Modal Geocoding search address field
+    async function searchModalAddress() {
+        const query = document.getElementById('modalSearchAddress').value;
+        if (!query || query.length < 3) return;
+
+        try {
+            const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query + ', Sri Lanka')}`);
+            const data = await res.json();
+            if (data && data.length > 0) {
+                const first = data[0];
+                const lat = parseFloat(first.lat);
+                const lng = parseFloat(first.lon);
+                
+                modalMarker.setLatLng([lat, lng]);
+                modalMap.panTo([lat, lng]);
+                updateModalStatus(lat, lng);
+            } else {
+                alert('Location not found in Sri Lanka. Try refinement.');
             }
-        }, 1200);
-    });
-
-    document.getElementById('latitude').addEventListener('change', updateMarkerFromInputs);
-    document.getElementById('longitude').addEventListener('change', updateMarkerFromInputs);
-
-    function updateMarkerFromInputs() {
-        const lat = parseFloat(document.getElementById('latitude').value);
-        const lng = parseFloat(document.getElementById('longitude').value);
-        if (!isNaN(lat) && !isNaN(lng)) {
-            marker.setLatLng([lat, lng]);
-            map.panTo([lat, lng]);
+        } catch (err) {
+            console.error('Geocoding error:', err);
         }
     }
 
