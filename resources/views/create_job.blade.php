@@ -38,7 +38,6 @@
                 <h1 class="text-headline-lg font-headline-lg text-white font-bold text-3xl">New Service Dispatch</h1>
                 <p class="text-body-md text-on-surface-variant mt-xs">Schedule and assign a new AC maintenance task for immediate deployment.</p>
             </div>
-            <!-- Standard spacing: gap-4 ensures they are spaced correctly -->
             <div class="flex gap-4 mt-4">
                 <a href="/dashboard" class="px-4 py-2.5 border border-white/10 text-white font-semibold rounded-lg hover:bg-white/5 transition-colors flex items-center">Cancel</a>
                 <button type="submit" class="px-6 py-2.5 bg-secondary text-on-secondary font-semibold rounded-lg shadow-lg shadow-secondary/20 hover:brightness-105 active:scale-95 transition-all flex items-center gap-2">
@@ -58,7 +57,7 @@
                         <span class="material-symbols-outlined text-secondary">person_pin_circle</span>
                         <h2 class="text-headline-sm font-headline-sm font-semibold text-white">Client Information</h2>
                     </div>
-                    <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6 relative">
                         <div class="flex flex-col gap-4">
                             <div>
                                 <label class="block text-label-caps font-label-caps text-on-surface-variant mb-1">CLIENT NAME</label>
@@ -78,21 +77,25 @@
                             <div class="grid grid-cols-2 gap-2">
                                 <div>
                                     <label class="block text-label-caps text-on-surface-variant mb-1 text-[10px]">LATITUDE</label>
-                                    <input class="w-full bg-[#1A1B3A] border border-white/10 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-secondary focus:border-transparent outline-none text-xs" id="latitude" placeholder="e.g. 41.8781" required type="number" step="any" />
+                                    <input class="w-full bg-[#1A1B3A] border border-white/10 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-secondary focus:border-transparent outline-none text-xs" id="latitude" placeholder="e.g. 6.9271" required type="number" step="any" />
                                 </div>
                                 <div>
                                     <label class="block text-label-caps text-on-surface-variant mb-1 text-[10px]">LONGITUDE</label>
-                                    <input class="w-full bg-[#1A1B3A] border border-white/10 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-secondary focus:border-transparent outline-none text-xs" id="longitude" placeholder="e.g. -87.6298" required type="number" step="any" />
+                                    <input class="w-full bg-[#1A1B3A] border border-white/10 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-secondary focus:border-transparent outline-none text-xs" id="longitude" placeholder="e.g. 79.8612" required type="number" step="any" />
                                 </div>
                             </div>
                         </div>
                         <!-- Geolocation Map Picker -->
-                        <div class="relative h-full min-h-[260px] rounded-xl border border-white/10 overflow-hidden">
+                        <div id="map-container" class="relative h-full min-h-[260px] rounded-xl border border-white/10 overflow-hidden transition-all duration-300">
                             <div id="map" class="w-full h-full min-h-[260px] opacity-90"></div>
                             <div class="absolute top-3 left-12 bg-[#101415]/90 backdrop-blur-sm p-2 rounded-lg border border-white/10 shadow-lg z-[1000] pointer-events-none">
                                 <span class="text-label-caps font-label-caps text-primary block text-[10px]">MAP PICKER</span>
                                 <span class="text-label-caps font-label-caps text-secondary text-[11px]">Click or drag pin to select location</span>
                             </div>
+                            <!-- Expand to big view button -->
+                            <button type="button" onclick="toggleFullscreenMap()" class="absolute top-3 right-3 bg-[#101415]/90 backdrop-blur-sm p-2 rounded-lg border border-white/10 shadow-lg z-[1000] hover:bg-white/10 text-white transition-colors flex items-center justify-center" title="Toggle Big Map View">
+                                <span id="expand-icon" class="material-symbols-outlined text-[18px]">fullscreen</span>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -150,16 +153,19 @@
 <!-- Leaflet Map JS -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script>
-    // Initialize Map default (Chicago area commands)
-    let map = L.map('map').setView([41.8781, -87.6298], 11);
+    // Initialize Map default - Colombo, Sri Lanka command command command
+    let map = L.map('map').setView([6.9271, 79.8612], 13);
     
     // Add dark theme tile layer matching design
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
         maxZoom: 20
     }).addTo(map);
 
-    // Initial marker placement
-    let marker = L.marker([41.8781, -87.6298], { draggable: true }).addTo(map);
+    // Initial marker placement centered in Colombo, Sri Lanka
+    let marker = L.marker([6.9271, 79.8612], { draggable: true }).addTo(map);
+
+    // Set defaults in form coordinates
+    updateCoords(6.9271, 79.8612);
 
     function updateCoords(lat, lng) {
         document.getElementById('latitude').value = lat.toFixed(6);
@@ -177,6 +183,30 @@
         updateCoords(e.latlng.lat, e.latlng.lng);
         reverseGeocode(e.latlng.lat, e.latlng.lng);
     });
+
+    // Toggle Big Map Mode
+    function toggleFullscreenMap() {
+        const container = document.getElementById('map-container');
+        const icon = document.getElementById('expand-icon');
+        const mapEl = document.getElementById('map');
+        
+        const isFullscreen = container.classList.contains('fixed');
+        
+        if (!isFullscreen) {
+            container.classList.add('fixed', 'inset-10', 'z-[9999]', 'glass-card', 'shadow-2xl');
+            mapEl.style.height = '100%';
+            icon.innerText = 'fullscreen_exit';
+        } else {
+            container.classList.remove('fixed', 'inset-10', 'z-[9999]', 'glass-card', 'shadow-2xl');
+            mapEl.style.height = '';
+            icon.innerText = 'fullscreen';
+        }
+
+        // recalculate Map size
+        setTimeout(() => {
+            map.invalidateSize(true);
+        }, 100);
+    }
 
     // Reverse geocoding via OpenStreetMap API
     async function reverseGeocode(lat, lng) {
@@ -200,7 +230,8 @@
         
         searchTimeout = setTimeout(async () => {
             try {
-                const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`);
+                // Focus on Sri Lanka geocoding specifically
+                const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query + ', Sri Lanka')}`);
                 const data = await res.json();
                 if (data && data.length > 0) {
                     const first = data[0];
