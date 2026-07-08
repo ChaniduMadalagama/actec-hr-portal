@@ -1,0 +1,481 @@
+---
+---
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8" />
+<meta content="width=device-width, initial-scale=1.0" name="viewport" />
+<title>LogiFlow Dispatch - Technician Management</title>
+<script src="/assets/03ba5d9f9e95fc3599acebcbe7e5fb9a.js" is:inline="" />
+<link href="/assets/0f60630073a0d3e5ff06cfa428922188.css" rel="stylesheet" />
+<link href="/assets/a39f5c6fcbb87b419667ec984d2e579a.css" rel="stylesheet" />
+<link href="/assets/9df0d028785caf8570e26419767bb9cb.css" rel="stylesheet" />
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-container": "#2170e4",
+                        "on-surface": "#0d1c2d",
+                        "on-tertiary-fixed-variant": "#2f2ebe",
+                        "on-error-container": "#93000a",
+                        "error": "#ba1a1a",
+                        "on-tertiary": "#ffffff",
+                        "surface-tint": "#565e74",
+                        "on-secondary-container": "#fefcff",
+                        "inverse-surface": "#233143",
+                        "surface": "#f8f9ff",
+                        "on-primary-container": "#7c839b",
+                        "on-primary-fixed-variant": "#3f465c",
+                        "surface-variant": "#d4e4fa",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-low": "#eef4ff",
+                        "error-container": "#ffdad6",
+                        "outline": "#76777d",
+                        "primary-fixed": "#dae2fd",
+                        "on-secondary": "#ffffff",
+                        "inverse-on-surface": "#e9f1ff",
+                        "tertiary-fixed-dim": "#c0c1ff",
+                        "surface-container": "#e5efff",
+                        "on-surface-variant": "#45464d",
+                        "surface-dim": "#ccdbf2",
+                        "on-tertiary-fixed": "#07006c",
+                        "surface-container-highest": "#d4e4fa",
+                        "secondary-fixed": "#d8e2ff",
+                        "primary": "#000000",
+                        "on-primary-fixed": "#131b2e",
+                        "surface-bright": "#f8f9ff",
+                        "surface-container-high": "#dbe9ff",
+                        "on-secondary-fixed": "#001a42",
+                        "secondary-fixed-dim": "#adc6ff",
+                        "on-tertiary-container": "#7073ff",
+                        "on-error": "#ffffff",
+                        "outline-variant": "#c6c6cd",
+                        "background": "#f8f9ff",
+                        "tertiary": "#000000",
+                        "inverse-primary": "#bec6e0",
+                        "secondary": "#0058be",
+                        "tertiary-container": "#07006c",
+                        "on-secondary-fixed-variant": "#004395",
+                        "on-primary": "#ffffff",
+                        "on-background": "#0d1c2d",
+                        "primary-container": "#131b2e",
+                        "primary-fixed-dim": "#bec6e0",
+                        "tertiary-fixed": "#e1e0ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "sm": "8px",
+                        "md": "16px",
+                        "lg": "24px",
+                        "xl": "32px",
+                        "base": "4px",
+                        "xs": "4px",
+                        "gutter": "16px",
+                        "container-margin": "24px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "data-mono": ["JetBrains Mono"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-lg": ["30px", {"lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-sm": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                        "headline-sm": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "data-mono": ["13px", {"lineHeight": "16px", "fontWeight": "500"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9ff;
+        }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-background text-on-surface overflow-hidden">
+<div class="flex h-screen w-full">
+<!-- SideNavBar Anchor -->
+<aside class="hidden md:flex flex-col h-full py-lg px-md gap-sm bg-surface-container-low border-r border-outline-variant w-64">
+<div class="mb-xl px-sm">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 bg-secondary-container rounded-lg flex items-center justify-center text-on-secondary-container">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">local_shipping</span>
+</div>
+<div>
+<h2 class="font-headline-sm text-headline-sm font-bold text-on-surface">LogiFlow Dispatch</h2>
+<p class="text-[10px] text-on-surface-variant font-medium uppercase tracking-wider">Active: 42 Units</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 flex flex-col gap-xs"><a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-variant transition-all duration-150 ease-in-out font-body-md text-body-md rounded-lg" href="#"><span class="material-symbols-outlined">local_shipping</span><span class="">Dispatch</span></a><a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-variant transition-all duration-150 ease-in-out font-body-md text-body-md rounded-lg" href="#"><span class="material-symbols-outlined">analytics</span><span class="">Analytics</span></a><a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-variant transition-all duration-150 ease-in-out font-body-md text-body-md rounded-lg" href="#"><span class="material-symbols-outlined">assignment</span><span class="">Job Queue</span></a><a class="flex items-center gap-md px-md py-sm bg-secondary-container text-on-secondary-container font-bold rounded-lg transition-all duration-150 ease-in-out font-body-md text-body-md" href="#"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">engineering</span><span class="">Technicians</span></a><a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-variant transition-all duration-150 ease-in-out font-body-md text-body-md rounded-lg" href="#"><span class="material-symbols-outlined">history</span><span class="">Time &amp; Audit</span></a><a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-variant transition-all duration-150 ease-in-out font-body-md text-body-md rounded-lg" href="#"><span class="material-symbols-outlined">settings</span><span class="">Settings</span></a></nav>
+<button class="mt-md mb-lg bg-secondary text-on-secondary py-sm px-md rounded-lg font-bold flex items-center justify-center gap-sm transition-all active:scale-95">
+<span class="material-symbols-outlined">add</span>
+                New Dispatch
+            </button>
+<div class="border-t border-outline-variant pt-md flex flex-col gap-xs">
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-variant transition-all duration-150 ease-in-out font-body-md text-body-md rounded-lg" href="#">
+<span class="material-symbols-outlined">support_agent</span>
+<span class="">Support</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-variant transition-all duration-150 ease-in-out font-body-md text-body-md rounded-lg" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="">Sign Out</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col min-w-0 overflow-hidden">
+<!-- TopNavBar Anchor -->
+<header class="sticky top-0 z-50 flex justify-between items-center px-lg py-sm w-full bg-surface border-b border-outline-variant">
+<div class="flex items-center gap-lg flex-1">
+<h1 class="font-headline-md text-headline-md font-bold text-primary">Technician Management</h1>
+<div class="relative w-full max-w-md ml-lg">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="w-full bg-surface-container-low border border-outline-variant rounded-lg pl-xl pr-md py-xs font-body-md focus:ring-2 focus:ring-secondary-container focus:border-secondary outline-none transition-all" placeholder="Search technician by name, ID or username..." type="text" />
+</div>
+</div>
+<div class="flex items-center gap-md">
+<button class="p-xs text-on-surface-variant hover:bg-surface-container rounded-full transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-xs text-on-surface-variant hover:bg-surface-container rounded-full transition-colors mr-md">
+<span class="material-symbols-outlined">help</span>
+</button>
+<button class="bg-secondary text-on-secondary px-md py-sm rounded-lg font-bold flex items-center gap-sm hover:opacity-90 active:scale-95 transition-all" onclick="openModal()">
+<span class="material-symbols-outlined">person_add</span>
+                        Register New Technician
+                    </button>
+</div>
+</header>
+<!-- Dashboard Content -->
+<div class="p-lg overflow-y-auto custom-scrollbar flex-1">
+<!-- Stats Summary -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-md mb-lg">
+<div class="bg-surface-container-lowest border border-outline-variant p-md rounded-xl">
+<p class="text-label-caps font-label-caps text-on-surface-variant">TOTAL TECHNICIANS</p>
+<h3 class="text-headline-md font-headline-md text-on-surface mt-xs">158</h3>
+<p class="text-body-sm text-secondary mt-xs flex items-center gap-xs">
+<span class="material-symbols-outlined text-[14px]">trending_up</span> +12% from last month
+                        </p>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant p-md rounded-xl">
+<p class="text-label-caps font-label-caps text-on-surface-variant">IN-FIELD ACTIVE</p>
+<h3 class="text-headline-md font-headline-md text-on-surface mt-xs">84</h3>
+<div class="w-full bg-surface-variant h-1 rounded-full mt-sm">
+<div class="bg-secondary w-2/3 h-full rounded-full" />
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant p-md rounded-xl">
+<p class="text-label-caps font-label-caps text-on-surface-variant">AVERAGE RESPONSE</p>
+<h3 class="text-headline-md font-headline-md text-on-surface mt-xs">24m</h3>
+<p class="text-body-sm text-on-surface-variant mt-xs">Target: 20m</p>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant p-md rounded-xl">
+<p class="text-label-caps font-label-caps text-on-surface-variant">SYSTEM OFFLINE</p>
+<h3 class="text-headline-md font-headline-md text-on-surface mt-xs">12</h3>
+<p class="text-body-sm text-error mt-xs">Requires update</p>
+</div>
+</div>
+<!-- Technician Table Card -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden shadow-sm">
+<div class="px-md py-sm border-b border-outline-variant flex justify-between items-center bg-white">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Technician Directory</h3>
+<div class="flex gap-sm">
+<button class="flex items-center gap-sm px-sm py-xs border border-outline-variant rounded-lg text-body-sm hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-[18px]">filter_list</span>
+                                Filter
+                            </button>
+<button class="flex items-center gap-sm px-sm py-xs border border-outline-variant rounded-lg text-body-sm hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-[18px]">download</span>
+                                Export CSV
+                            </button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low border-b-2 border-outline-variant">
+<th class="px-md py-sm font-label-caps text-label-caps text-on-surface-variant">NAME &amp; PROFILE</th>
+<th class="px-md py-sm font-label-caps text-label-caps text-on-surface-variant">CONTACT NUMBER</th>
+<th class="px-md py-sm font-label-caps text-label-caps text-on-surface-variant">APP USERNAME</th>
+<th class="px-md py-sm font-label-caps text-label-caps text-on-surface-variant">STATUS</th>
+<th class="px-md py-sm font-label-caps text-label-caps text-on-surface-variant text-right">ACTIONS</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant font-body-md text-body-md">
+<tr class="hover:bg-surface-container transition-colors">
+<td class="px-md py-sm">
+<div class="flex items-center gap-md">
+<img alt="Marcus" class="w-10 h-10 rounded-full bg-surface-variant" data-alt="A professional headshot avatar of a male technician with a friendly expression, wearing a navy blue service polo shirt. The background is a clean, neutral gray office setting with soft studio lighting, maintaining a modern and professional logistics company aesthetic." src="/assets/abb05dc997b5cbdcd8309f15c4543518.png" />
+<div>
+<div class="font-semibold text-on-surface">Marcus Finn</div>
+<div class="text-body-sm text-on-surface-variant">Senior Specialist</div>
+</div>
+</div>
+</td>
+<td class="px-md py-sm text-on-surface-variant">+1 (555) 012-4456</td>
+<td class="px-md py-sm font-data-mono text-data-mono text-secondary">@m_finn</td>
+<td class="px-md py-sm">
+<span class="inline-flex items-center gap-xs px-sm py-xs bg-emerald-100 text-emerald-700 rounded-full text-[11px] font-bold uppercase tracking-wider">
+<span class="w-2 h-2 rounded-full bg-emerald-500" />
+                                            Active
+                                        </span>
+</td>
+<td class="px-md py-sm text-right">
+<button class="p-xs text-on-surface-variant hover:text-secondary transition-colors"><span class="material-symbols-outlined">edit</span></button>
+<button class="p-xs text-on-surface-variant hover:text-secondary transition-colors"><span class="material-symbols-outlined">more_vert</span></button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container transition-colors">
+<td class="px-md py-sm">
+<div class="flex items-center gap-md">
+<img alt="Sarah" class="w-10 h-10 rounded-full bg-surface-variant" data-alt="A professional portrait of a female technician with glasses and a confident smile, wearing a dark navy utility vest over a white shirt. The image is bright and crisp, with a minimalist background that emphasizes the clean, industrial professional brand of LogiFlow Dispatch." src="/assets/3e59c989c8e0967807127171d3ab6fe8.png" />
+<div>
+<div class="font-semibold text-on-surface">Sarah Jenkins</div>
+<div class="text-body-sm text-on-surface-variant">Field Lead</div>
+</div>
+</div>
+</td>
+<td class="px-md py-sm text-on-surface-variant">+1 (555) 012-7890</td>
+<td class="px-md py-sm font-data-mono text-data-mono text-secondary">@s_jenkins</td>
+<td class="px-md py-sm">
+<span class="inline-flex items-center gap-xs px-sm py-xs bg-amber-100 text-amber-700 rounded-full text-[11px] font-bold uppercase tracking-wider">
+<span class="w-2 h-2 rounded-full bg-amber-500" />
+                                            In-Field
+                                        </span>
+</td>
+<td class="px-md py-sm text-right">
+<button class="p-xs text-on-surface-variant hover:text-secondary transition-colors"><span class="material-symbols-outlined">edit</span></button>
+<button class="p-xs text-on-surface-variant hover:text-secondary transition-colors"><span class="material-symbols-outlined">more_vert</span></button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container transition-colors">
+<td class="px-md py-sm">
+<div class="flex items-center gap-md">
+<img alt="Robert" class="w-10 h-10 rounded-full bg-surface-variant" data-alt="A middle-aged male technician with a short beard, wearing a high-visibility vest over a navy uniform. He looks focused and professional. The scene is well-lit with cool daylight, creating a high-fidelity, resilient brand atmosphere suitable for a data-driven logistics dashboard." src="/assets/e5e6d6779c2bdc54b076f662ef2318f9.png" />
+<div>
+<div class="font-semibold text-on-surface">Robert Chen</div>
+<div class="text-body-sm text-on-surface-variant">Diagnostics</div>
+</div>
+</div>
+</td>
+<td class="px-md py-sm text-on-surface-variant">+1 (555) 012-2234</td>
+<td class="px-md py-sm font-data-mono text-data-mono text-secondary">@r_chen</td>
+<td class="px-md py-sm">
+<span class="inline-flex items-center gap-xs px-sm py-xs bg-surface-variant text-on-surface-variant rounded-full text-[11px] font-bold uppercase tracking-wider">
+<span class="w-2 h-2 rounded-full bg-outline" />
+                                            On Break
+                                        </span>
+</td>
+<td class="px-md py-sm text-right">
+<button class="p-xs text-on-surface-variant hover:text-secondary transition-colors"><span class="material-symbols-outlined">edit</span></button>
+<button class="p-xs text-on-surface-variant hover:text-secondary transition-colors"><span class="material-symbols-outlined">more_vert</span></button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container transition-colors">
+<td class="px-md py-sm">
+<div class="flex items-center gap-md">
+<img alt="Elena" class="w-10 h-10 rounded-full bg-surface-variant" data-alt="A portrait of a young female technician with her hair tied back, wearing a navy blue logistics company branded sweatshirt. She has an approachable yet professional demeanor. The image style is sharp and modern, following the industrial modern aesthetic of the Fleet Central design system." src="/assets/f354107d18785a44b936fc5d6e897473.png" />
+<div>
+<div class="font-semibold text-on-surface">Elena Rodriguez</div>
+<div class="text-body-sm text-on-surface-variant">Maintenance</div>
+</div>
+</div>
+</td>
+<td class="px-md py-sm text-on-surface-variant">+1 (555) 012-9988</td>
+<td class="px-md py-sm font-data-mono text-data-mono text-secondary">@e_rodriguez</td>
+<td class="px-md py-sm">
+<span class="inline-flex items-center gap-xs px-sm py-xs bg-red-100 text-red-700 rounded-full text-[11px] font-bold uppercase tracking-wider">
+<span class="w-2 h-2 rounded-full bg-red-500" />
+                                            Offline
+                                        </span>
+</td>
+<td class="px-md py-sm text-right">
+<button class="p-xs text-on-surface-variant hover:text-secondary transition-colors"><span class="material-symbols-outlined">edit</span></button>
+<button class="p-xs text-on-surface-variant hover:text-secondary transition-colors"><span class="material-symbols-outlined">more_vert</span></button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="px-md py-sm border-t border-outline-variant flex justify-between items-center bg-white">
+<p class="text-body-sm text-on-surface-variant">Showing 1-10 of 158 technicians</p>
+<div class="flex gap-xs">
+<button class="p-xs border border-outline-variant rounded hover:bg-surface-container-low transition-colors"><span class="material-symbols-outlined">chevron_left</span></button>
+<button class="px-sm py-xs border border-secondary text-secondary bg-surface-container rounded text-body-sm font-bold">1</button>
+<button class="px-sm py-xs border border-outline-variant rounded text-body-sm hover:bg-surface-container-low">2</button>
+<button class="px-sm py-xs border border-outline-variant rounded text-body-sm hover:bg-surface-container-low">3</button>
+<button class="p-xs border border-outline-variant rounded hover:bg-surface-container-low transition-colors"><span class="material-symbols-outlined">chevron_right</span></button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- Registration Modal Overlay -->
+<div class="fixed inset-0 z-[100] hidden bg-black/40 backdrop-blur-sm flex items-center justify-center p-md" id="registrationModal">
+<!-- Form View -->
+<div class="bg-white w-full max-w-lg rounded-xl shadow-2xl overflow-hidden border border-outline-variant" id="formView">
+<div class="px-lg py-md border-b border-outline-variant flex justify-between items-center bg-surface-container-low">
+<div>
+<h2 class="font-headline-sm text-headline-sm font-bold text-on-surface">Register New Technician</h2>
+<p class="text-body-sm text-on-surface-variant">Initialize a new employee profile in the dispatch network.</p>
+</div>
+<button class="p-xs hover:bg-surface-variant rounded-full transition-colors" onclick="closeModal()">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<form class="p-lg space-y-md" id="techForm" onsubmit="handleRegistration(event)">
+<div class="space-y-xs">
+<label class="font-label-caps text-label-caps text-on-surface-variant">FULL NAME</label>
+<input class="w-full bg-white border border-outline-variant rounded-lg px-md py-sm font-body-md focus:ring-2 focus:ring-secondary-container focus:border-secondary outline-none" id="fullName" placeholder="e.g. Michael Finn" required="" type="text" />
+</div>
+<div class="grid grid-cols-2 gap-md">
+<div class="space-y-xs">
+<label class="font-label-caps text-label-caps text-on-surface-variant">PHONE NUMBER</label>
+<input class="w-full bg-white border border-outline-variant rounded-lg px-md py-sm font-body-md focus:ring-2 focus:ring-secondary-container focus:border-secondary outline-none" id="phone" placeholder="+1 (000) 000-0000" required="" type="tel" />
+</div>
+<div class="space-y-xs">
+<label class="font-label-caps text-label-caps text-on-surface-variant">EMAIL ADDRESS</label>
+<input class="w-full bg-white border border-outline-variant rounded-lg px-md py-sm font-body-md focus:ring-2 focus:ring-secondary-container focus:border-secondary outline-none" id="email" placeholder="m.finn@logiflow.com" required="" type="email" />
+</div>
+</div>
+<div class="space-y-xs">
+<label class="font-label-caps text-label-caps text-on-surface-variant">ROLE / DEPARTMENT</label>
+<select class="w-full bg-white border border-outline-variant rounded-lg px-md py-sm font-body-md focus:ring-2 focus:ring-secondary-container focus:border-secondary outline-none appearance-none">
+<option>General Technician</option>
+<option>Field Diagnostics Specialist</option>
+<option>Maintenance Engineer</option>
+<option>Apprentice</option>
+</select>
+</div>
+<div class="pt-md border-t border-outline-variant flex justify-end gap-md">
+<button class="px-md py-sm font-bold text-on-surface-variant hover:bg-surface-container rounded-lg transition-colors" onclick="closeModal()" type="button">Cancel</button>
+<button class="px-lg py-sm bg-secondary text-on-secondary font-bold rounded-lg shadow-sm hover:opacity-90 active:scale-95 transition-all" type="submit">Create Profile</button>
+</div>
+</form>
+</div>
+<!-- Success View (Hidden initially) -->
+<div class="hidden bg-white w-full max-w-lg rounded-xl shadow-2xl overflow-hidden border border-outline-variant" id="successView">
+<div class="p-lg text-center bg-emerald-50 border-b border-emerald-100">
+<div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-md border-4 border-white shadow-sm">
+<span class="material-symbols-outlined text-[32px]">check_circle</span>
+</div>
+<h2 class="font-headline-md text-headline-md font-bold text-on-surface">Registration Successful</h2>
+<p class="text-body-md text-on-surface-variant mt-xs">Profile created for <span class="font-bold text-on-surface" id="displayTechName">Michael Finn</span></p>
+</div>
+<div class="p-lg space-y-lg">
+<div class="grid grid-cols-2 gap-md">
+<div class="p-md bg-surface-container-low rounded-xl border border-outline-variant">
+<p class="text-label-caps font-label-caps text-on-surface-variant mb-xs">UNIQUE USERNAME</p>
+<p class="font-data-mono text-data-mono text-secondary text-lg" id="genUsername">@m_finn_29</p>
+</div>
+<div class="p-md bg-surface-container-low rounded-xl border border-outline-variant">
+<p class="text-label-caps font-label-caps text-on-surface-variant mb-xs">TEMPORARY PASSWORD</p>
+<div class="flex justify-between items-center">
+<p class="font-data-mono text-data-mono text-on-surface text-lg tracking-wider" id="genPassword">LF-772-XT9</p>
+<button class="text-secondary hover:underline text-body-sm font-bold">Show</button>
+</div>
+</div>
+</div>
+<div class="space-y-sm">
+<label class="font-label-caps text-label-caps text-on-surface-variant">INVITATION PREVIEW</label>
+<div class="p-md bg-surface border border-outline-variant rounded-lg text-body-sm text-on-surface-variant italic leading-relaxed">
+                        "Welcome to LogiFlow, <span class="not-italic font-bold text-on-surface">Michael Finn</span>! Your dispatcher account is ready. Username: @m_finn_29 | Temp Pass: LF-772-XT9. Please login at fleet.logiflow.io/app to start your shift."
+                    </div>
+</div>
+<div class="flex flex-col gap-sm">
+<p class="text-label-caps font-label-caps text-on-surface-variant text-center">SHARE CREDENTIALS VIA</p>
+<div class="grid grid-cols-3 gap-sm">
+<button class="flex flex-col items-center gap-xs p-md border border-outline-variant rounded-xl hover:bg-surface-container-low transition-all">
+<span class="material-symbols-outlined text-secondary">sms</span>
+<span class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">SMS</span>
+</button>
+<button class="flex flex-col items-center gap-xs p-md border border-outline-variant rounded-xl hover:bg-surface-container-low transition-all">
+<span class="material-symbols-outlined text-emerald-600">chat</span>
+<span class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">WhatsApp</span>
+</button>
+<button class="flex flex-col items-center gap-xs p-md border border-outline-variant rounded-xl hover:bg-surface-container-low transition-all" onclick="copyToClipboard()">
+<span class="material-symbols-outlined text-on-surface">content_copy</span>
+<span class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Copy</span>
+</button>
+</div>
+</div>
+<button class="w-full py-sm border border-outline-variant rounded-lg font-bold hover:bg-surface-container-low transition-colors" onclick="closeModal()">Done, Return to Dashboard</button>
+</div>
+</div>
+</div>
+<script>
+        function openModal() {
+            document.getElementById('registrationModal').classList.remove('hidden');
+            document.getElementById('formView').classList.remove('hidden');
+            document.getElementById('successView').classList.add('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('registrationModal').classList.add('hidden');
+            document.getElementById('techForm').reset();
+        }
+
+        function handleRegistration(event) {
+            event.preventDefault();
+            const name = document.getElementById('fullName').value;
+            
+            // Artificial delay for feedback
+            const submitBtn = event.target.querySelector('button[type="submit"]');
+            submitBtn.innerHTML = '<span class="material-symbols-outlined animate-spin">sync</span> Creating...';
+            submitBtn.disabled = true;
+
+            setTimeout(() => {
+                document.getElementById('displayTechName').innerText = name;
+                document.getElementById('genUsername').innerText = `@${name.toLowerCase().replace(/\s+/g, '_')}_${Math.floor(Math.random() * 99)}`;
+                
+                document.getElementById('formView').classList.add('hidden');
+                document.getElementById('successView').classList.remove('hidden');
+                
+                submitBtn.innerHTML = 'Create Profile';
+                submitBtn.disabled = false;
+            }, 800);
+        }
+
+        function copyToClipboard() {
+            // Mock feedback
+            const copyBtn = event.currentTarget;
+            const originalHtml = copyBtn.innerHTML;
+            copyBtn.innerHTML = '<span class="material-symbols-outlined text-emerald-500">done</span><span class="text-[10px] font-bold uppercase tracking-widest text-emerald-500">Copied</span>';
+            setTimeout(() => { copyBtn.innerHTML = originalHtml; }, 2000);
+        }
+
+        // Close on escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+    </script>
+
+
+</body></html>
