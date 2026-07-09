@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import '../services/api_service.dart';
 import 'login_screen.dart';
 import 'dashboard_screen.dart';
@@ -41,6 +42,15 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   }
 
   Future<void> _checkAuthStatus() async {
+    try {
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+    } catch (e) {
+      debugPrint('Location permission request error: $e');
+    }
+
     final isLoggedIn = await ApiService.isLoggedIn();
     if (!mounted) return;
 
