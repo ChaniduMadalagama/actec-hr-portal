@@ -2,13 +2,16 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user.dart';
+import '../models/job.dart';
 
 class ApiService {
-  // Use 10.0.2.2 for Android emulator to connect to localhost on host machine
-  // If testing on a real device on same network, change to host's local IP (e.g., 192.168.x.x)
-  static const String baseUrl = 'http://10.0.2.2:8000/api/v1';
+  // Use host LAN IP address since app runs on a physical device
+  static const String baseUrl = 'http://192.168.1.4:8000/api/v1';
 
-  static Future<Map<String, dynamic>> login(String username, String password) async {
+  static Future<Map<String, dynamic>> login(
+    String username,
+    String password,
+  ) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/auth/login'),
@@ -16,10 +19,7 @@ class ApiService {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
-        body: jsonEncode({
-          'username': username,
-          'password': password,
-        }),
+        body: jsonEncode({'username': username, 'password': password}),
       );
 
       final data = jsonDecode(response.body);
@@ -28,12 +28,9 @@ class ApiService {
         // Save token
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('api_token', data['token']);
-        
+
         // Parse and return user
-        return {
-          'success': true,
-          'user': User.fromJson(data['user']),
-        };
+        return {'success': true, 'user': User.fromJson(data['user'])};
       } else {
         return {
           'success': false,
@@ -45,6 +42,34 @@ class ApiService {
         'success': false,
         'message': 'Failed to connect to the server: $e',
       };
+    }
+  }
+
+  static Future<List<Job>> getAssignedJobs() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('api_token');
+      if (token == null) return [];
+
+      final response = await http.get(
+        Uri.parse('$baseUrl/tech/jobs/assigned'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = jsonDecode(response.body);
+        if (data['data'] != null) {
+          final List<dynamic> jobsJson = data['data'];
+          return jobsJson.map((json) => Job.fromJson(json)).toList();
+        }
+      }
+      return [];
+    } catch (e) {
+      return [];
     }
   }
 
