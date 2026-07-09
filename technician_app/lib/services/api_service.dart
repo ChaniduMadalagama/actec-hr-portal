@@ -1,3 +1,4 @@
+// ignore_for_file: avoid_print
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -8,17 +9,59 @@ class ApiService {
   // Use host LAN IP address since app runs on a physical device
   static const String baseUrl = 'http://192.168.1.4:8000/api/v1';
 
+  // Helper request sender with logging built-in
+  static Future<http.Response> _sendRequest(
+    String method,
+    String path, {
+    Map<String, String>? headers,
+    dynamic body,
+  }) async {
+    final url = Uri.parse('$baseUrl$path');
+    final Map<String, String> requestHeaders = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      ...?headers,
+    };
+
+    // Print Request Details to Console
+    print('📡 --- HTTP REQUEST ---');
+    print('METHOD : $method');
+    print('URL    : $url');
+    print('HEADERS: $requestHeaders');
+    if (body != null) {
+      print('BODY   : $body');
+    }
+    print('----------------------');
+
+    http.Response response;
+    try {
+      if (method == 'POST') {
+        response = await http.post(url, headers: requestHeaders, body: body);
+      } else {
+        response = await http.get(url, headers: requestHeaders);
+      }
+    } catch (e) {
+      print('❌ HTTP CONNECTION ERROR: $e');
+      rethrow;
+    }
+
+    // Print Response Details to Console
+    print('📥 --- HTTP RESPONSE ---');
+    print('STATUS : ${response.statusCode}');
+    print('BODY   : ${response.body}');
+    print('-----------------------');
+
+    return response;
+  }
+
   static Future<Map<String, dynamic>> login(
     String username,
     String password,
   ) async {
     try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/auth/login'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
+      final response = await _sendRequest(
+        'POST',
+        '/auth/login',
         body: jsonEncode({'username': username, 'password': password}),
       );
 
@@ -49,27 +92,130 @@ class ApiService {
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('api_token');
-      if (token == null) return [];
+      if (token == null) {
+        print('⚠️ API ERROR: Missing stored api_token');
+        return [];
+      }
 
-      final response = await http.get(
-        Uri.parse('$baseUrl/tech/jobs/assigned'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
+      final response = await _sendRequest(
+        'GET',
+        '/tech/jobs/assigned',
+        headers: {'Authorization': 'Bearer $token'},
       );
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> data = jsonDecode(response.body);
-        if (data['data'] != null) {
-          final List<dynamic> jobsJson = data['data'];
-          return jobsJson.map((json) => Job.fromJson(json)).toList();
+        final decoded = jsonDecode(response.body);
+        if (decoded is List) {
+          return decoded
+              .map((json) => Job.fromJson(json as Map<String, dynamic>))
+              .toList();
+        } else if (decoded is Map && decoded['data'] != null) {
+          final List<dynamic> jobsJson = decoded['data'];
+          return jobsJson
+              .map((json) => Job.fromJson(json as Map<String, dynamic>))
+              .toList();
         }
       }
       return [];
     } catch (e) {
+      print('❌ ERROR GETTING JOBS: $e');
       return [];
+    }
+  }
+
+  static Future<Map<String, dynamic>> startRoute(int jobId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('api_token');
+      if (token == null) return {'success': false, 'message': 'Not logged in'};
+
+      final response = await _sendRequest(
+        'POST',
+        '/tech/jobs/$jobId/start-route',
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      final data = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        return {'success': true};
+      } else {
+        return {
+          'success': false,
+          'message': data['message'] ?? 'Failed to start route',
+        };
+      }
+    } catch (e) {
+      return {'success': false, 'message': 'Connection error: $e'};
+    }
+  }
+
+  static Future<Map<String, dynamic>> checkIn(
+    int jobId,
+    double lat,
+    double lng,
+  ) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('api_token');
+      if (token == null) return {'success': false, 'message': 'Not logged in'};
+
+      final response = await _sendRequest(
+        'POST',
+        '/tech/jobs/$jobId/check-in',
+        headers: {'Authorization': 'Bearer $token'},
+        body: jsonEncode({
+          'hardware_timestamp': DateTime.now().toIso8601String(),
+          'latitude': lat,
+          'longitude': lng,
+        }),
+      );
+
+      final data = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        return {'success': true};
+      } else {
+        return {
+          'success': false,
+          'message': data['message'] ?? 'Failed to check in',
+        };
+      }
+    } catch (e) {
+      return {'success': false, 'message': 'Connection error: $e'};
+    }
+  }
+
+  static Future<Map<String, dynamic>> checkOut(
+    int jobId,
+    double lat,
+    double lng,
+  ) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('api_token');
+      if (token == null) return {'success': false, 'message': 'Not logged in'};
+
+      final response = await _sendRequest(
+        'POST',
+        '/tech/jobs/$jobId/check-out',
+        headers: {'Authorization': 'Bearer $token'},
+        body: jsonEncode({
+          'hardware_timestamp': DateTime.now().toIso8601String(),
+          'latitude': lat,
+          'longitude': lng,
+        }),
+      );
+
+      final data = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        return {'success': true};
+      } else {
+        return {
+          'success': false,
+          'message': data['message'] ?? 'Failed to check out',
+        };
+      }
+    } catch (e) {
+      return {'success': false, 'message': 'Connection error: $e'};
     }
   }
 

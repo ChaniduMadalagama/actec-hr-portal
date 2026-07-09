@@ -3,6 +3,7 @@ import '../services/api_service.dart';
 import '../core/theme.dart';
 import '../models/job.dart';
 import 'login_screen.dart';
+import 'job_details_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -160,103 +161,114 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         itemCount: _jobs.length,
                         itemBuilder: (context, index) {
                           final job = _jobs[index];
-                          return Card(
-                            color: AppTheme.surface,
-                            elevation: 4,
-                            margin: const EdgeInsets.only(bottom: 16.0),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16.0),
-                              side: const BorderSide(color: Colors.white10),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(20.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        '#JOB-${job.id}',
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold,
-                                          color: AppTheme.secondaryAccent,
-                                        ),
-                                      ),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                                        decoration: BoxDecoration(
-                                          color: _getStatusColor(job.status).withValues(alpha: 0.1),
-                                          borderRadius: BorderRadius.circular(12),
-                                          border: Border.all(
-                                            color: _getStatusColor(job.status).withValues(alpha: 0.5),
-                                          ),
-                                        ),
-                                        child: Text(
-                                          job.status.toUpperCase(),
-                                          style: TextStyle(
-                                            fontSize: 11,
+                          return InkWell(
+                            onTap: () async {
+                              await Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) => JobDetailsScreen(job: job),
+                                ),
+                              );
+                              _fetchJobs();
+                            },
+                            borderRadius: BorderRadius.circular(16.0),
+                            child: Card(
+                              color: AppTheme.surface,
+                              elevation: 4,
+                              margin: const EdgeInsets.only(bottom: 16.0),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16.0),
+                                side: const BorderSide(color: Colors.white10),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(20.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          '#JOB-${job.id}',
+                                          style: const TextStyle(
+                                            fontSize: 14,
                                             fontWeight: FontWeight.bold,
-                                            color: _getStatusColor(job.status),
+                                            color: AppTheme.secondaryAccent,
                                           ),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 16),
-                                  Text(
-                                    job.clientName,
-                                    style: const TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                                          decoration: BoxDecoration(
+                                            color: _getStatusColor(job.status).withValues(alpha: 0.1),
+                                            borderRadius: BorderRadius.circular(12),
+                                            border: Border.all(
+                                              color: _getStatusColor(job.status).withValues(alpha: 0.5),
+                                            ),
+                                          ),
+                                          child: Text(
+                                            job.status.toUpperCase(),
+                                            style: TextStyle(
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.bold,
+                                              color: _getStatusColor(job.status),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Row(
-                                    children: [
-                                      const Icon(Icons.phone, size: 16, color: AppTheme.textOutline),
-                                      const SizedBox(width: 8),
-                                      Text(
-                                        job.clientPhone,
-                                        style: const TextStyle(color: AppTheme.textOutline),
+                                    const SizedBox(height: 16),
+                                    Text(
+                                      job.clientName,
+                                      style: const TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
                                       ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Row(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      const Icon(Icons.location_on, size: 16, color: AppTheme.textOutline),
-                                      const SizedBox(width: 8),
-                                      Expanded(
-                                        child: Text(
-                                          job.serviceAddress,
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Row(
+                                      children: [
+                                        const Icon(Icons.phone, size: 16, color: AppTheme.textOutline),
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          job.clientPhone,
                                           style: const TextStyle(color: AppTheme.textOutline),
                                         ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Row(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        const Icon(Icons.location_on, size: 16, color: AppTheme.textOutline),
+                                        const SizedBox(width: 8),
+                                        Expanded(
+                                          child: Text(
+                                            job.serviceAddress,
+                                            style: const TextStyle(color: AppTheme.textOutline),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    if (job.issueDescription.isNotEmpty) ...[
+                                      const SizedBox(height: 12),
+                                      const Divider(color: Colors.white10),
+                                      const SizedBox(height: 8),
+                                      const Text(
+                                        'ISSUE DESCRIPTION:',
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.bold,
+                                          color: AppTheme.textOutline,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        job.issueDescription,
+                                        style: const TextStyle(color: Colors.white70),
                                       ),
                                     ],
-                                  ),
-                                  if (job.issueDescription.isNotEmpty) ...[
-                                    const SizedBox(height: 12),
-                                    const Divider(color: Colors.white10),
-                                    const SizedBox(height: 8),
-                                    const Text(
-                                      'ISSUE DESCRIPTION:',
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.bold,
-                                        color: AppTheme.textOutline,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      job.issueDescription,
-                                      style: const TextStyle(color: Colors.white70),
-                                    ),
                                   ],
-                                ],
+                                ),
                               ),
                             ),
                           );
