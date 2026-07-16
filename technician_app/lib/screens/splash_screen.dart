@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import '../services/api_service.dart';
 import 'login_screen.dart';
-import 'dashboard_screen.dart';
+import 'main_navigation_screen.dart';
 import '../core/theme.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -56,7 +56,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
 
     if (isLoggedIn) {
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const DashboardScreen()),
+        MaterialPageRoute(builder: (_) => const MainNavigationScreen()),
       );
     } else {
       Navigator.of(context).pushReplacement(

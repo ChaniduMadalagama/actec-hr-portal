@@ -6,8 +6,21 @@ import '../models/user.dart';
 import '../models/job.dart';
 
 class ApiService {
-  // Use host LAN IP address since app runs on a physical device
-  static const String baseUrl = 'http://192.168.1.4:8000/api/v1';
+  static String? _baseUrlOverride;
+  static const String defaultBaseUrl = 'http://192.168.1.4:8000/api/v1';
+
+  static Future<String> get baseUrl async {
+    if (_baseUrlOverride != null) return _baseUrlOverride!;
+    final prefs = await SharedPreferences.getInstance();
+    _baseUrlOverride = prefs.getString('api_base_url') ?? defaultBaseUrl;
+    return _baseUrlOverride!;
+  }
+
+  static Future<void> setBaseUrl(String newUrl) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('api_base_url', newUrl);
+    _baseUrlOverride = newUrl;
+  }
 
   // Helper request sender with logging built-in
   static Future<http.Response> _sendRequest(
@@ -16,7 +29,8 @@ class ApiService {
     Map<String, String>? headers,
     dynamic body,
   }) async {
-    final url = Uri.parse('$baseUrl$path');
+    final base = await baseUrl;
+    final url = Uri.parse('$base$path');
     final Map<String, String> requestHeaders = {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
@@ -68,9 +82,10 @@ class ApiService {
       final data = jsonDecode(response.body);
 
       if (response.statusCode == 200 && data['token'] != null) {
-        // Save token
+        // Save token & user profile
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('api_token', data['token']);
+        await prefs.setString('user_profile', jsonEncode(data['user']));
 
         // Parse and return user
         return {'success': true, 'user': User.fromJson(data['user'])};
@@ -86,6 +101,19 @@ class ApiService {
         'message': 'Failed to connect to the server: $e',
       };
     }
+  }
+
+  static Future<User?> getCachedUser() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final userStr = prefs.getString('user_profile');
+      if (userStr != null) {
+        return User.fromJson(jsonDecode(userStr));
+      }
+    } catch (e) {
+      print('Error decoding cached user: $e');
+    }
+    return null;
   }
 
   static Future<List<Job>> getAssignedJobs() async {
@@ -222,6 +250,7 @@ class ApiService {
   static Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('api_token');
+    await prefs.remove('user_profile');
   }
 
   static Future<bool> isLoggedIn() async {

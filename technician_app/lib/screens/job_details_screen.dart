@@ -4,6 +4,7 @@ import 'package:geolocator/geolocator.dart';
 import '../models/job.dart';
 import '../services/api_service.dart';
 import '../core/theme.dart';
+import '../core/navigation_helper.dart';
 
 class JobDetailsScreen extends StatefulWidget {
   final Job job;
@@ -108,6 +109,13 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
               content: Text('Route started successfully!'),
               backgroundColor: Colors.green,
             ),
+          );
+
+          // Launch Google Maps navigation automatically
+          await NavigationHelper.launchGoogleMaps(
+            context,
+            latitude: _job.latitude,
+            longitude: _job.longitude,
           );
         } else {
           _showError(result['message']);
@@ -388,22 +396,39 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                         ],
                       ),
                       const SizedBox(height: 16),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Icon(Icons.location_on, color: AppTheme.secondaryAccent, size: 20),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text('SERVICE ADDRESS', style: TextStyle(fontSize: 10, color: AppTheme.textOutline)),
-                                const SizedBox(height: 2),
-                                Text(_job.serviceAddress, style: const TextStyle(color: Colors.white, fontSize: 16)),
-                              ],
-                            ),
-                          )
-                        ],
+                      InkWell(
+                        onTap: () => NavigationHelper.launchGoogleMaps(
+                          context,
+                          latitude: _job.latitude,
+                          longitude: _job.longitude,
+                        ),
+                        borderRadius: BorderRadius.circular(8),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4.0),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Icon(Icons.location_on, color: AppTheme.secondaryAccent, size: 20),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Row(
+                                      children: [
+                                        Text('SERVICE ADDRESS', style: TextStyle(fontSize: 10, color: AppTheme.textOutline)),
+                                        SizedBox(width: 8),
+                                        Icon(Icons.directions, size: 12, color: AppTheme.secondaryAccent),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(_job.serviceAddress, style: const TextStyle(color: Colors.white, fontSize: 16)),
+                                  ],
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
                       ),
                       const SizedBox(height: 16),
                       Row(
